@@ -30,10 +30,17 @@ def index():
 
     return render_template('index.html')
 
+@app.route('/', methods=['GET', 'POST'])
 def Admin():
 
     return render_template('Admin.html')
 
+@app.route('/', methods=['GET', 'POST'])
 def Reservations():
     
     return render_template('Reservations.html')
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0")
+
+app.run(host="0.0.0.0")
