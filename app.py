@@ -30,3 +30,10 @@ def index():
 
     return render_template('index.html')
 
+def Admin():
+
+    return render_template('Admin.html')
+
+def Reservations():
+    
+    return render_template('Reservations.html')
