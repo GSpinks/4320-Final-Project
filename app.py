@@ -129,7 +129,12 @@ def reservations():
             conn.commit()
             conn.close()
 
-            message = f"Reservation successful! Your e-ticket number is {e_ticket_number}."
+            # Update success message with seat details
+            message = (
+                f"Reservation successful! Your e-ticket number is {e_ticket_number}. "
+                f"Your reserved seat is Row {row + 1}, Seat {seat + 1}."
+            )
+
             # Refresh seating chart after the reservation
             seating_chart = generate_seating_chart()
 
