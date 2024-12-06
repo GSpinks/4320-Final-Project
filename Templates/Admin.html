@@ -3,6 +3,42 @@
 {% block title %}Admin Login{% endblock %}
 
 {% block content %}
-<h1>Admin Login Page</h1>
-<p>Welcome, Admin! Please log in.</p>
+<h1>Admin Login</h1>
+
+<!-- Show login form only if not logged in -->
+{% if not show_chart %}
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+{% endif %}
+
+<!-- Display chart/dashboard after successful login -->
+{% if show_chart %}
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, Admin! Here's the seating chart:</p>
+
+    <!-- Seating Chart -->
+    <table border="1" style="border-collapse: collapse; text-align: center;">
+        {% for row in seating_chart %}
+        <tr>
+            {% for seat in row %}
+            <td style="padding: 10px;">{{ seat }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Total Sales -->
+    <h3>Total Sales: ${{ total_sales }}</h3>
+{% endif %}
 {% endblock %}
