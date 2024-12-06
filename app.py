@@ -74,9 +74,14 @@ def generate_seating_chart():
     # Mark reserved seats as 'X'
     for seat in reserved_seats:
         row, col = seat
-        seating_chart[row - 1][col - 1] = 'X'  # Convert to 0-based index
+        # Ensure row and column indices are within bounds
+        if 0 <= row < rows and 0 <= col < columns:
+            seating_chart[row][col] = 'X'  # No adjustment needed if database is 0-indexed
+        else:
+            print(f"Warning: Invalid seat coordinates ({row}, {col}) ignored.")
 
     return seating_chart
+
 
 def get_cost_matrix():
     """Generates a 12 x 4 cost matrix"""
