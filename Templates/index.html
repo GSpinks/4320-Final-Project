@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Bus Reservation System{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Bus Reservation System</h1>
+<form method="POST">
+    <label for="page">Select a page:</label>
+    <select id="page" name="page">
+        <option value="choose" selected>Choose Option</option>
+        <option value="admin">Admin Login</option>
+        <option value="reservations">Reservations</option>
+    </select>
+    <button type="submit">Go</button>
+</form>
+
+<!-- Display error message if it exists -->
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+{% endblock %}

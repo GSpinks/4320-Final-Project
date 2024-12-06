@@ -1,46 +1,37 @@
-from flask import Flask, render_template, request, flash, url_for
+from flask import Flask, render_template, request, redirect, url_for
 from markupsafe import Markup
 import csv
 import os
 from time import time
 import sqlite3
 
+from flask import Flask, render_template, request, redirect, url_for, flash
+
 app = Flask(__name__)
 app.config["DEBUG"] = True
-app.config["SECRET_KEY"] = "your secret key"
-
-def get_cost_matrix():
-    cost_matrix = [[100, 75, 50, 100] for row in range(12)]
-    return cost_matrix
-
-def db_connect():
-    conn = sqlite3.connect('reservations.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM reservations")
-    res_rows = cursor.fetchall()
-    cursor.execute("SELECT * FROM admins")
-    admin_rows = cursor.fetchall()
-    return res_rows, admin_rows
+app.config["SECRET_KEY"] = "your_secret_key"
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    error_message = None  # Default is no error
+    if request.method == 'POST':
+        selected_option = request.form.get('page')
+        if selected_option == "choose":
+            error_message = "Please select a valid option from the dropdown."
+        elif selected_option == 'admin':
+            return redirect(url_for('admin'))
+        elif selected_option == 'reservations':
+            return redirect(url_for('reservations'))
+    return render_template('index.html', error_message=error_message)
 
-
-
-
-    return render_template('index.html')
-
-@app.route('/', methods=['GET', 'POST'])
-def Admin():
-
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
     return render_template('Admin.html')
 
-@app.route('/', methods=['GET', 'POST'])
-def Reservations():
-    
+@app.route('/reservations', methods=['GET', 'POST'])
+def reservations():
     return render_template('Reservations.html')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
 
-app.run(host="0.0.0.0")
