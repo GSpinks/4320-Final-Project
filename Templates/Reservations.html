@@ -20,4 +20,39 @@
     </tr>
     {% endfor %}
 </table>
+
+<!-- Display feedback message -->
+{% if message %}
+    <p style="color: green;">{{ message }}</p>
+{% endif %}
+
+<!-- Reservation Form -->
+<h2>Make a Reservation</h2>
+<form method="POST">
+    <label for="first_name">First Name:</label>
+    <input type="text" id="first_name" name="first_name" required>
+    <br>
+
+    <label for="last_name">Last Name:</label>
+    <input type="text" id="last_name" name="last_name" required>
+    <br>
+
+    <label for="row">Row:</label>
+    <select id="row" name="row" required>
+        {% for r in range(1, 13) %}
+        <option value="{{ r }}">{{ r }}</option>
+        {% endfor %}
+    </select>
+    <br>
+
+    <label for="seat">Seat:</label>
+    <select id="seat" name="seat" required>
+        {% for s in range(1, 5) %}
+        <option value="{{ s }}">{{ s }}</option>
+        {% endfor %}
+    </select>
+    <br>
+
+    <button type="submit">Reserve</button>
+</form>
 {% endblock %}

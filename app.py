@@ -101,11 +101,56 @@ def calculate_total_sales(seating_chart):
     return total_sales
 
 
-@app.route('/reservations', methods=['GET'])
+@app.route('/reservations', methods=['GET', 'POST'])
 def reservations():
-    # Generate the seating chart
     seating_chart = generate_seating_chart()
-    return render_template('Reservations.html', seating_chart=seating_chart)
+    message = None  # Feedback for the user
+
+    if request.method == 'POST':
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        row = int(request.form.get('row')) - 1  # Convert to 0-indexed
+        seat = int(request.form.get('seat')) - 1  # Convert to 0-indexed
+
+        # Check if the seat is available
+        if seating_chart[row][seat] == 'X':
+            message = "The selected seat is already reserved. Please choose another seat."
+        else:
+            # Generate e-ticket
+            e_ticket_number = generate_eticket(first_name, last_name)
+
+            # Reserve the seat in the database
+            conn = db_connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)",
+                (f"{first_name} {last_name}", row, seat, e_ticket_number)
+            )
+            conn.commit()
+            conn.close()
+
+            message = f"Reservation successful! Your e-ticket number is {e_ticket_number}."
+            # Refresh seating chart after the reservation
+            seating_chart = generate_seating_chart()
+
+    return render_template('Reservations.html', seating_chart=seating_chart, message=message)
+
+def generate_eticket(first_name, last_name):
+    """
+    Generates eticket by alternating characters from strings and combining them
+    """
+    combined_name = first_name + last_name
+    base_string = "IT4320"
+    eticket = []
+
+    for i in range(max(len(combined_name), len(base_string))):
+        if i < len(combined_name):
+            eticket.append(combined_name[i])
+        if i < len(base_string):
+            eticket.append(base_string[i])
+    
+    return ''.join(eticket)
+
 
 
 if __name__ == '__main__':
