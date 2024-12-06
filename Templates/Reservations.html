@@ -1,8 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Reservations{% endblock %}
+{% block title %}Reserve your seat{% endblock %}
 
 {% block content %}
-<h1>Reservations Page</h1>
-<p>Book your bus tickets here.</p>
+<h1>Reserve your seat</h1>
+
+<h2>Seating Chart</h2>
+<p><strong>Legend:</strong> X = Reserved, O = Open</p>
+
+<!-- Seating Chart -->
+<table border="1" style="border-collapse: collapse; text-align: center;">
+    {% for row in seating_chart %}
+    <tr>
+        {% for seat in row %}
+        <td style="padding: 10px; {% if seat == 'X' %} background-color: red; color: white; {% else %} background-color: green; color: white; {% endif %}">
+            {{ seat }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

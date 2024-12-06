@@ -101,9 +101,12 @@ def calculate_total_sales(seating_chart):
     return total_sales
 
 
-@app.route('/reservations', methods=['GET', 'POST'])
+@app.route('/reservations', methods=['GET'])
 def reservations():
-    return render_template('Reservations.html')
+    # Generate the seating chart
+    seating_chart = generate_seating_chart()
+    return render_template('Reservations.html', seating_chart=seating_chart)
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
