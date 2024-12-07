@@ -18,7 +18,7 @@ This is a simple Flask-based bus reservation system designed for IT students att
    ```bash
    git clone https://github.com/GSpinks/4320-Final-Project
    ```
-2. Change your directory to that of the project
+2. Change your directory to that of the project:
    ```bash
    cd 4320-Final-Project
    ```
