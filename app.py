@@ -1,12 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from markupsafe import Markup
-import csv
-import os
-from time import time
-import sqlite3
-
 from flask import Flask, render_template, request, redirect, url_for, flash
-
+import sqlite3
 
 def db_connect():
     return sqlite3.connect('reservations.db')
@@ -17,7 +10,7 @@ app.config["SECRET_KEY"] = "your_secret_key"
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    error_message = None  # Default is no error
+    error_message = None # Default is no error
     if request.method == 'POST':
         selected_option = request.form.get('page')
         if selected_option == "choose":
@@ -33,16 +26,16 @@ def admin():
     error_message = None
     show_chart = False
     seating_chart = None
-    total_sales = 0  # Default: no sales
+    total_sales = 0 # Default is no sales
 
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # Connect to the database
+        # Connects to the database
         conn = db_connect()
         cursor = conn.cursor()
-        # Query the admins table
+        # Queries the admins table
         cursor.execute("SELECT * FROM admins WHERE username = ? AND password = ?", (username, password))
         admin = cursor.fetchone()
 
@@ -58,15 +51,18 @@ def admin():
     return render_template('Admin.html', error_message=error_message, show_chart=show_chart, seating_chart=seating_chart, total_sales=total_sales)
 
 def generate_seating_chart():
-    # Define the seating chart dimensions
-    rows = 12  # Number of rows
-    columns = 4  # Number of columns
+    """
+    Generates a seating chart based on reserved seats in the database.
+    """
+    # Defines the seating chart dimensions
+    rows = 12
+    columns = 4
     seating_chart = [['O' for _ in range(columns)] for _ in range(rows)]
 
-    # Connect to the database
+    # Connects to the database
     conn = db_connect()
     cursor = conn.cursor()
-    # Get all reserved seats
+    # Gets all the reserved seats
     cursor.execute("SELECT seatRow, seatColumn FROM reservations")
     reserved_seats = cursor.fetchall()
     conn.close()
@@ -74,52 +70,58 @@ def generate_seating_chart():
     # Mark reserved seats as 'X'
     for seat in reserved_seats:
         row, col = seat
-        # Ensure row and column indices are within bounds
+        # Forces row and column indices to be within bounds
         if 0 <= row < rows and 0 <= col < columns:
-            seating_chart[row][col] = 'X'  # No adjustment needed if database is 0-indexed
+            seating_chart[row][col] = 'X'
         else:
             print(f"Warning: Invalid seat coordinates ({row}, {col}) ignored.")
 
     return seating_chart
 
-
 def get_cost_matrix():
-    """Generates a 12 x 4 cost matrix"""
+    """
+    Generates a 12 x 4 cost matrix.
+    """
     cost_matrix = [[100, 75, 50, 100] for _ in range(12)]
     return cost_matrix
 
 def calculate_total_sales(seating_chart):
-    """Calculates the total sales based on reserved seats and the cost matrix"""
+    """
+    Calculates the total sales based on reserved seats and the cost matrix.
+    """
     cost_matrix = get_cost_matrix()
     total_sales = 0
 
     for row_index, row in enumerate(seating_chart):
         for col_index, seat in enumerate(row):
-            if seat == 'X':  # Reserved seat
+            if seat == 'X':
                 total_sales += cost_matrix[row_index][col_index]
 
     return total_sales
 
-
 @app.route('/reservations', methods=['GET', 'POST'])
 def reservations():
     seating_chart = generate_seating_chart()
-    message = None  # Feedback for the user
+    message = None
 
     if request.method == 'POST':
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        row = int(request.form.get('row')) - 1  # Convert to 0-indexed
-        seat = int(request.form.get('seat')) - 1  # Convert to 0-indexed
+        row = int(request.form.get('row')) - 1 # Converts to 0-indexed
+        seat = int(request.form.get('seat')) - 1 # Converts to 0-indexed
 
-        # Check if the seat is available
-        if seating_chart[row][seat] == 'X':
+        # Validates input
+        if not first_name or not last_name:
+            message = "First name and last name are required."
+        elif not (0 <= row < 12) or not (0 <= seat < 4):
+            message = "Invalid seat selection. Please choose a valid seat."
+        elif seating_chart[row][seat] == 'X':
             message = "The selected seat is already reserved. Please choose another seat."
         else:
-            # Generate e-ticket
+            # Generates e-ticket
             e_ticket_number = generate_eticket(first_name, last_name)
 
-            # Reserve the seat in the database
+            # Reserves the seat
             conn = db_connect()
             cursor = conn.cursor()
             cursor.execute(
@@ -129,20 +131,20 @@ def reservations():
             conn.commit()
             conn.close()
 
-            # Update success message with seat details
+            # Updates success message to include seat details
             message = (
                 f"Reservation successful! Your e-ticket number is {e_ticket_number}. "
                 f"Your reserved seat is Row {row + 1}, Seat {seat + 1}."
             )
 
-            # Refresh seating chart after the reservation
+            # Now, refresh seating chart
             seating_chart = generate_seating_chart()
 
     return render_template('Reservations.html', seating_chart=seating_chart, message=message)
 
 def generate_eticket(first_name, last_name):
     """
-    Generates eticket by alternating characters from strings and combining them
+    Generates an e-ticket by alternating characters from the first and last name and combining them with a base string.
     """
     combined_name = first_name + last_name
     base_string = "IT4320"
@@ -156,8 +158,5 @@ def generate_eticket(first_name, last_name):
     
     return ''.join(eticket)
 
-
-
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
-
