@@ -15,14 +15,23 @@ This is a simple Flask-based bus reservation system designed for IT students att
 ## Setup Instructions
 
 1. Clone the repository.
-2. Install dependencies:
+   ```bash
+   git clone https://github.com/GSpinks/4320-Final-Project
+   ```
+2. Change your directory to that of the project
+   ```bash
+   cd 4320-Final-Project
+   ```
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-3. Run the application:
+5. Run the application:
    ```bash
    python app.py
    ```
+
+The app will be available at `http://localhost:5000`.
 
 ## Docker Setup (Optional)
 
@@ -36,8 +45,6 @@ To run the application inside a Docker container:
    ```bash
    docker-compose up
    ```
-
-The app will be available at `http://localhost:5000`.
 
 ## Database
 
